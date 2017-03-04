@@ -12,5 +12,8 @@ export {
   getUpdateQuery,
   getDeleteQuery
 } from './queries';
-export { getViewableFields } from './utils';
+export {
+  getViewableFields,
+  getFieldDef
+} from './utils';
 export { getApiSchema } from './getApiSchema';
