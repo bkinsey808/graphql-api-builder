@@ -1,0 +1,47 @@
+{
+  "name": "graphql-api-builder",
+  "version": "0.0.1",
+  "description": "allows you to build your apollo graphql api in an organized and structured way",
+  "main": "dist/index.js",
+  "scripts": {
+    "commit": "git-cz",
+    "clean": "rm -rf dist/*",
+    "build": "npm run clean && tsc",
+    "build-esm": "&& tsc -m es6 --outDir dist/lib-esm",
+    "dev": "node_modules/.bin/nodemon --watch 'src/**/*.ts' --ignore 'src/**/*.spec.ts' --exec 'node_modules/.bin/ts-node' src/index.ts"
+  },
+  "keywords": [
+    "apollo",
+    "graphql",
+    "schema",
+    "autogen"
+  ],
+  "author": "Ben Kinsey",
+  "license": "MIT",
+  "dependencies": {
+    "capitalize": "^1.0.0",
+    "graphql": "^0.9.1",
+    "graphql-subscriptions": "^0.3.0",
+    "graphql-tag": "^1.2.4",
+    "graphql-tools": "^0.10.1",
+    "lcfirst": "^1.0.0",
+    "pluralize": "^4.0.0",
+    "reflect-metadata": "^0.1.9"
+  },
+  "devDependencies": {
+    "@types/graphql": "^0.8.6",
+    "@types/reflect-metadata": "0.0.5",
+    "awesome-typescript-loader": "^3.0.4",
+    "commitizen": "^2.9.5",
+    "cz-conventional-changelog": "^2.0.0",
+    "nodemon": "^1.11.0",
+    "ts-node": "^2.0.0",
+    "typescript": "^2.1.5",
+    "webpack": "^2.2.1"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}
