@@ -21,12 +21,16 @@ export const getFieldDef = (fieldApi: FieldApi, isRequired) =>
 const getObjectTypeDefHeader = (apiObject, description) =>
   (description ? `#${description}\n` : '') + `type ${apiObject} {\n`;
 
-const getObjectTypeDef = (objectApi: ObjectApi): string =>
-  objectApi.fields.reduce(
-    (accumulator: string, fieldApi: FieldApi) =>
-      accumulator += getFieldDef(fieldApi, false),
-    getObjectTypeDefHeader(objectApi.apiObject, objectApi.description)
-  ) + '}\n';
+const getObjectTypeDefReducer = (accumulator: string, fieldApi: FieldApi) =>
+  accumulator += getFieldDef(fieldApi, false);
+
+const getObjectTypeDef = (objectApi: ObjectApi): string => {
+  const initialValue =
+    getObjectTypeDefHeader(objectApi.apiObject, objectApi.description);
+  return objectApi.fields
+    .filter((fieldApi: FieldApi) => fieldApi.allowedForView)
+    .reduce(getObjectTypeDefReducer, initialValue) + '}\n';
+};
 
 const getObjectTypeDefs = (objectApis: ObjectApis) =>
   Object.keys(objectApis)
@@ -35,8 +39,8 @@ const getObjectTypeDefs = (objectApis: ObjectApis) =>
 
 const getQueryTypeDefFromResult = (queryApiResult: QueryApiResult) =>
   (queryApiResult.description ? `#${queryApiResult.description}\n` : '') +
-    queryApiResult.typeDef +
-    '\n';
+  queryApiResult.typeDef +
+  '\n';
 
 const getQueryTypeDef = (queryApi: QueryApi, objectApi: ObjectApi) =>
   getQueryTypeDefFromResult(queryApi(objectApi));
@@ -49,44 +53,39 @@ const getQueryTypeDefsForObjectApi =
       .map(queryApi => getQueryTypeDef(queryApi, objectApi))
       .join('\n');
 
+const getQueryTypeDefsForObject = (objectApis: ObjectApis, apisType: ApisType) =>
+  Object.keys(objectApis)
+    .map(key => getQueryTypeDefsForObjectApi(objectApis[key], apisType))
+    .join();
+
 const getQueryTypeDefs = (objectApis: ObjectApis) =>
-  `type Query {\n` +
-    Object.keys(objectApis)
-      .map(
-        key => getQueryTypeDefsForObjectApi(objectApis[key], 'queryApis')
-      )
-      .join() +
-    `}\n`;
+  `type Query {\n${getQueryTypeDefsForObject(objectApis, 'queryApis')}}\n`;
 
 const getMutationTypeDefs = (objectApis: ObjectApis) =>
-  `type Mutation {\n` +
-    Object.keys(objectApis)
-      .map(
-        key => getQueryTypeDefsForObjectApi(objectApis[key], 'mutationApis')
-      )
-      .join() +
-    `}\n`;
+  `type Mutation {\n${getQueryTypeDefsForObject(objectApis, 'mutationApis')}}\n`;
+
+const getQueryResolversForObjectApiReducer = (objectApi: ObjectApi) =>
+  (accumulator: {}, queryApi: QueryApi) => {
+    const queryApiResult: QueryApiResult = queryApi(objectApi);
+    accumulator[queryApiResult.resolverName] = queryApiResult.resolver;
+    return accumulator;
+  };
 
 const getQueryResolversForObjectApi =
-  (objectApi: ObjectApi, apisType: ApisType) =>
-    objectApi[apisType].reduce(
-      (accumulator: {}, queryApi: QueryApi) => {
-        const queryApiResult: QueryApiResult = queryApi(objectApi);
-        accumulator[queryApiResult.resolverName] = queryApiResult.resolver;
-        return accumulator;
-      },
-      {}
-    );
+  (objectApi: ObjectApi, apisType: ApisType) => {
+    const reducer = getQueryResolversForObjectApiReducer(objectApi);
+    return objectApi[apisType].reduce(reducer, {});
+  };
+
+const getQueryOrMutationResolversReducer =
+  (accumulator, queryResolversForObjectApi) =>
+    Object.assign(accumulator, queryResolversForObjectApi);
 
 const getQueryOrMutationResolvers =
   (objectApis: ObjectApis, apisType: ApisType) =>
     Object.keys(objectApis)
       .map(key => getQueryResolversForObjectApi(objectApis[key], apisType))
-      .reduce(
-        (accumulator, queryResolversForObjectApi) =>
-          Object.assign(accumulator, queryResolversForObjectApi),
-        {}
-      );
+      .reduce(getQueryOrMutationResolversReducer, {});
 
 const getQueryResolvers = (objectApis: ObjectApis) =>
   getQueryOrMutationResolvers(objectApis, 'queryApis');
@@ -94,10 +93,13 @@ const getQueryResolvers = (objectApis: ObjectApis) =>
 const getMutationResolvers = (objectApis: ObjectApis) =>
   getQueryOrMutationResolvers(objectApis, 'mutationApis');
 
-const getTypeDefs = (objectApis: ObjectApis) =>
-  getObjectTypeDefs(objectApis) +
+const getTypeDefs = (objectApis: ObjectApis) => {
+  const typeDefs =
+    getObjectTypeDefs(objectApis) +
     getQueryTypeDefs(objectApis) +
     getMutationTypeDefs(objectApis);
+  return typeDefs;
+};
 
 const getResolvers = (objectApis) => {
   return {

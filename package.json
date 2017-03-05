@@ -1,6 +1,6 @@
 {
   "name": "graphql-api-builder",
-  "version": "0.0.3",
+  "version": "0.0.11",
   "description": "allows you to build your apollo graphql api in an organized and structured way",
   "main": "dist/index.js",
   "scripts": {
