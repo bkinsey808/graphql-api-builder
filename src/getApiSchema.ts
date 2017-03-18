@@ -93,7 +93,7 @@ const getQueryResolvers = (objectApis: ObjectApis) =>
 const getMutationResolvers = (objectApis: ObjectApis) =>
   getQueryOrMutationResolvers(objectApis, 'mutationApis');
 
-const getTypeDefs = (objectApis: ObjectApis) => {
+export const getSchema = (objectApis: ObjectApis) => {
   const typeDefs =
     getObjectTypeDefs(objectApis) +
     getQueryTypeDefs(objectApis) +
@@ -108,8 +108,8 @@ const getResolvers = (objectApis) => {
   };
 };
 
-export const getApiSchema = (objectApis: ObjectApis): GraphQLSchema =>
+export const getExecutableSchema = (objectApis: ObjectApis): GraphQLSchema =>
   makeExecutableSchema({
-    typeDefs: getTypeDefs(objectApis),
+    typeDefs: getSchema(objectApis),
     resolvers: getResolvers(objectApis)
   });

@@ -16,4 +16,7 @@ export {
   getViewableFields,
   getFieldDef
 } from './utils';
-export { getApiSchema } from './getApiSchema';
+export {
+  getSchema,
+  getExecutableSchema
+} from './getApiSchema';
