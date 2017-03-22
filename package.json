@@ -1,6 +1,6 @@
 {
   "name": "graphql-api-builder",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "allows you to build your apollo graphql api in an organized and structured way",
   "main": "dist/index.js",
   "scripts": {
@@ -35,7 +35,7 @@
     "commitizen": "^2.9.5",
     "cz-conventional-changelog": "^2.0.0",
     "nodemon": "^1.11.0",
-    "ts-node": "^2.0.0",
+    "ts-node": "^3.0.2",
     "typescript": "^2.1.5",
     "webpack": "^2.2.1"
   },
