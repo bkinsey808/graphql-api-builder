@@ -14,7 +14,8 @@ export {
 } from './queries';
 export {
   getViewableFields,
-  getFieldDef
+  getFieldDef,
+  getCreateFields
 } from './utils';
 export {
   getSchema,
