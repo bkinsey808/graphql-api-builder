@@ -13,6 +13,7 @@ export {
   getDeleteQuery
 } from './queries';
 export {
+  getFieldsFilteredByProperties,
   getViewableFields,
   getFieldDef,
   getCreateFields

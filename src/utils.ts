@@ -5,6 +5,7 @@ import {
   FieldApi
 } from './definitions';
 
+
 export const getFieldDef = (fieldApi: FieldApi, isRequired = false) =>
   (fieldApi.description ? `# ${fieldApi.description}\n` : '') +
     `  ${fieldApi.apiField}: ${fieldApi.apiType}${isRequired ? '!' : ''}\n`;
@@ -27,6 +28,18 @@ export const getCreateFields = (objectApi: ObjectApi) =>
 
 export const isFieldViewable = (fieldApi: FieldApi, context) =>
   fieldApi.allowedForView;
+
+const allPropertiesMustMatchFilter = (properties) =>
+  (object) =>
+    Object.keys(properties).reduce((accumulator, propertyKey) =>
+      accumulator && (object[propertyKey] === properties[propertyKey])
+    , true);
+
+export const getFieldsFilteredByProperties =
+  (objectApi: ObjectApi, properties) =>
+    objectApi.fields
+      .filter(allPropertiesMustMatchFilter(properties))
+      .map((fieldApi: FieldApi) => fieldApi.apiField);
 
 export const getViewableFields = (objectApi: ObjectApi, context) =>
   objectApi.fields
